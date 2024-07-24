@@ -4,7 +4,8 @@
 
 using namespace std;
 
-const char* hostname = "127.0.0.1";
+const char* hostname = "127.0.0.1";                    /* Variabel-variabel ini menyimpan informasi koneksi ke database MySQL, 
+                                                            seperti hostname, username, password, nama database, dan port */
 const char* user = "root";
 const char* pass = "12345";
 const char* dbname = "cpp_crud";
@@ -12,7 +13,8 @@ unsigned int port = 31235;
 const char* unixsocket = NULL;
 unsigned long clientflag = 0;
 
-MYSQL* connect_db() {
+MYSQL* connect_db() {                               /* Fungsi connect_db menginisialisasi dan menghubungkan ke database MySQL. Jika berhasil, 
+                                                        fungsi mengembalikan pointer ke koneksi, jika tidak, mengembalikan pesan error. */
     MYSQL* conn = mysql_init(0);
     if (conn) {
         conn = mysql_real_connect(conn, hostname, user, pass, dbname, port, unixsocket, clientflag);
@@ -28,7 +30,9 @@ MYSQL* connect_db() {
 }
 
 bool register_user(const string& username, const string& password, const string& role) {
-    MYSQL* conn = connect_db();
+
+    MYSQL* conn = connect_db();                     /* Fungsi register_user menerima username, password, dan role sebagai parameter, 
+                                                        lalu menyimpan pengguna baru ke dalam tabel users. */
     if (conn) {
         string query = "INSERT INTO users (username, password, role) VALUES ('" + username + "', '" + password + "', '" + role + "')";
         if (mysql_query(conn, query.c_str())) {
@@ -45,7 +49,8 @@ bool register_user(const string& username, const string& password, const string&
 }
 
 bool login(const string& username, const string& password, string& role) {
-    MYSQL* conn = connect_db();
+
+    MYSQL* conn = connect_db();       /* Fungsi login memeriksa kredensial pengguna dan mengembalikan peran pengguna jika berhasil login. */
     if (conn) {
         string query = "SELECT role FROM users WHERE username = '" + username + "' AND password = '" + password + "'";
         if (mysql_query(conn, query.c_str())) {
@@ -77,7 +82,9 @@ bool login(const string& username, const string& password, string& role) {
 }
 
 void tambah_buku(const string& judul, const string& penulis, const string& genre, const string& penerbit, const string& tahun) {
-    MYSQL* conn = connect_db();
+
+    MYSQL* conn = connect_db();                                     /* Fungsi tambah_buku menambahkan buku baru ke dalam tabel books. */
+
     if (conn) {
         string query = "INSERT INTO books (judul, penulis, genre, penerbit, tahun) VALUES ('" + judul + "', '" + penulis + "', '" + genre + "', '" + penerbit + "', '" + tahun + "')";
         if (mysql_query(conn, query.c_str())) {
@@ -90,7 +97,7 @@ void tambah_buku(const string& judul, const string& penulis, const string& genre
 }
 
 void lihat_buku() {
-    MYSQL* conn = connect_db();
+    MYSQL* conn = connect_db();                                     /* Fungsi lihat_buku menampilkan semua buku yang ada di dalam tabel books. */
     if (conn) {
         if (mysql_query(conn, "SELECT * FROM books")) {
             cerr << "SELECT gagal: " << mysql_error(conn) << endl;
@@ -116,7 +123,9 @@ void lihat_buku() {
 }
 
 void ubah_buku(int id_buku, const string& judul, const string& genre, const string& penerbit) {
-    MYSQL* conn = connect_db();
+
+    MYSQL* conn = connect_db();                                     /* Fungsi ubah_buku memperbarui informasi buku berdasarkan ID buku. */
+
     if (conn) {
         stringstream query;
         query << "UPDATE books SET judul = '" << judul << "', genre = '" << genre << "', penerbit = '" << penerbit << "' WHERE id = " << id_buku;
@@ -130,7 +139,9 @@ void ubah_buku(int id_buku, const string& judul, const string& genre, const stri
 }
 
 void hapus_buku(int id_buku) {
-    MYSQL* conn = connect_db();
+
+    MYSQL* conn = connect_db();                                         /* Fungsi hapus_buku menghapus buku berdasarkan ID buku. */
+
     if (conn) {
         stringstream query;
         query << "DELETE FROM books WHERE id = " << id_buku;
@@ -144,7 +155,9 @@ void hapus_buku(int id_buku) {
 }
 
 void lihat_pengguna() {
-    MYSQL* conn = connect_db();
+
+    MYSQL* conn = connect_db();                            /* Fungsi lihat_pengguna menampilkan semua pengguna yang ada di dalam tabel users. */
+    
     if (conn) {
         if (mysql_query(conn, "SELECT * FROM users")) {
             cerr << "SELECT gagal: " << mysql_error(conn) << endl;
@@ -169,12 +182,13 @@ void lihat_pengguna() {
     }
 }
 
-void menu_admin() {
+void menu_admin() {                                         /* menu_admin menampilkan menu khusus untuk admin yang mencakup penambahan, 
+                                                                pengubahan, penghapusan buku, serta melihat semua buku dan pengguna. */
     int pilihan;
     while (true) {
         cout << "\nMenu Admin:\n";
         cout << "1. Tambah Buku\n";
-        cout << "2. Lihat Semua Buku\n";
+        cout << "2. Lihat Semua Buku \n";
         cout << "3. Ubah Buku\n";
         cout << "4. Hapus Buku\n";
         cout << "5. Lihat Semua Pengguna\n";
@@ -226,7 +240,7 @@ void menu_admin() {
     }
 }
 
-void menu_pengguna() {
+void menu_pengguna() {              /* menu_pengguna menampilkan menu khusus untuk pengguna biasa yang hanya mencakup melihat semua buku. */
     int pilihan;
     while (true) {
         cout << "\nMenu Pengguna:\n";
@@ -245,7 +259,8 @@ void menu_pengguna() {
     }
 }
 
-void menu_utama() {
+void menu_utama() {                 /* menu_utama menampilkan menu utama yang mencakup pendaftaran, login, dan keluar dari aplikasi. 
+                                        Setelah login berhasil, pengguna akan diarahkan ke menu sesuai dengan perannya. */
     int pilihan;
     while (true) {
         cout << "\nMenu Utama:\n";
@@ -298,3 +313,13 @@ int main() {
     menu_utama();
     return 0;
 }
+
+
+/* 
+
+Fungsi main memulai aplikasi dengan memanggil menu_utama.
+
+Secara keseluruhan, aplikasi ini mengelola data pengguna dan buku dengan memanfaatkan MySQL sebagai basis data, 
+memungkinkan operasi CRUD (Create, Read, Update, Delete) baik untuk pengguna maupun buku. 
+
+*/
